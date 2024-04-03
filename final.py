@@ -134,16 +134,21 @@ def from_heat_to_temperature(Q: int, capacity: float, po: float, radius:int, h: 
     delta_t = Q / (capacity*m)
     return delta_t
 
-def amount_of_heat(initial_temperature: float, final_temperature: float, capacity: int, po: int, radius: int, h: int):
+def amount_of_heat(alpha:float, radius:int, dTdr:float) -> float:
     """
-    Вычисление тепла, выделяемого на поверхности.
-    Используется формула 
-    Q = c*m*\delta t
+    Закон Фурье для теплопроводности:
+
+    Q = −α*A*dT/dr 
+
+    где:
+        Q - количество тепла, выделяемого на поверхность,
+        α - коэффициент теплопроводности воды,
+        A - площадь поперечного сечения канала,
+        dT/dr  - градиент температуры по радиусу.
+        α
     """
-    V = 2 * np.pi * radius * h
-    m = po * V
-    delta_t = initial_temperature - final_temperature
-    Q = capacity * m * delta_t
+    A = np.pi * (radius**2)
+    Q = alpha * A * dTdr
     return Q
 
 
@@ -202,13 +207,14 @@ def run_program(length:int, radius:int, time: int, magma:int, final_temperature:
 
     result_text.config(yscrollcommand=scrollbar.set)
 
-    answer = amount_of_heat(np.mean(L[-1][0]), final_temperature, capacity, po, dt, dl) 
+    dTdr = np.mean(L[-1][-1])
+    answer = amount_of_heat(alpha, dr, dTdr)
     answer_window = tk.Toplevel()
     answer_window.title("Ответ")
     
     # Создание текстового поля для отображения ответа
     answer_text = tk.Text(answer_window, font=("Arial", 12), wrap="word")
-    answer_text.insert(tk.END, f"Количество тепла, выделяемого на поверхности: {answer/1000000000} МДж")
+    answer_text.insert(tk.END, f"Количество тепла, выделяемого на поверхности: {answer} кДж")
     answer_text.pack()
 
    
