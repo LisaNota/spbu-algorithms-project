@@ -1,8 +1,6 @@
 """
 To run the Streamlit app, use the following command: streamlit run app/streamlit.py
 """
-
-
 import streamlit as st
 import numpy as np
 import calculations as calc
@@ -113,3 +111,6 @@ else:
 
     # Display the plot in Streamlit
     st.pyplot(fig)
+
+# Display the amount of heat that has been transferred at the upper boundary
+st.write("Heat transferred at the upper boundary:", calc.amount_of_heat(alpha, radius, L), "J")
