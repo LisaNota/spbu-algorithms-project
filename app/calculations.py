@@ -1,4 +1,3 @@
-import tkinter as tk
 import numpy as np
 
 
@@ -23,7 +22,7 @@ def from_heat_to_temperature(Q: int, capacity: float, po: float, radius:int, h: 
     delta_t = Q / (capacity*m)
     return delta_t
 
-def amount_of_heat(alpha:float, radius:int, dTdr:float) -> float:
+def amount_of_heat(alpha:float, radius:int, L:np.ndarray) -> float:
     """
     Закон Фурье для теплопроводности:
 
@@ -36,6 +35,9 @@ def amount_of_heat(alpha:float, radius:int, dTdr:float) -> float:
         dT/dr  - градиент температуры по радиусу.
         α
     """
+    # Вычисление среднего градиента температуры на поверхности
+    dTdr = np.mean(L[-1][-1])
+
     A = np.pi * (radius**2)
     Q = alpha * A * dTdr
     return Q
@@ -84,9 +86,5 @@ def run_program(length:int, radius:int, time: int, magma:int, final_temperature:
             L[j, el, number_radius_steps-1] = (L[j-1, el, number_radius_steps-1] + ((alpha * dt)/(((number_radius_steps-1)*dr) * (dr**2))) * \
             (L[j-1, el, (number_radius_steps - 2)] - 2*(L[j-1, el, (number_radius_steps - 1)]) + L[j-1, el, (number_radius_steps - 2)])) * 0.97 + float(from_heat_to_temperature(Q, capacity, po, dr, dl)) * 2
             
-    # Вычисление среднего градиента температуры на поверхности
-    dTdr = np.mean(L[-1][-1])
-    # Вычисление количества тепла, выделяемого на поверхность
-    answer = amount_of_heat(alpha, dr, dTdr)
     
-    return L, answer
+    return L
