@@ -66,25 +66,24 @@ def run_program(length:int, radius:int, time: int, magma:int, final_temperature:
     po = 1000 #кг/м^3
 
     # Создание трехмерного массива для хранения температур
-    L = np.ndarray((number_time_steps, number_length_steps, number_radius_steps))
+    L = np.ndarray((number_time_steps, number_length_steps,  number_radius_steps))
     
-    # Инициализация начальных значений температур
-    for i in range(number_length_steps):
+    for i in range(len(L)):
         L[0][i] = np.random.normal(100, 3, number_radius_steps)
-        L[0, i, 0] = L[0, i, 0] * 0.9 
+        L[0][i, 0] = L[0][i, 0] * 0.9 
 
-    # Вычисление температур на каждом временном шаге
-    for t in range(1, number_time_steps): # каждый промежуток времени
-        for el in range(number_length_steps): # Каждое кольцо 
-            # Вычисление температуры на поверхности
-            L[t, el, 0] = (L[t-1, el, 0] + ((alpha * dt)/(dr * (dr**2))) * (L[t-1, el, 1] - 2*(L[t-1, el, 0]) + L[t-1, el, 0])) + float(from_heat_to_temperature(Q, capacity, po, dr, dl))*(-1)
-            # Вычисление температур внутри канала
+
+    for j in range(1, number_time_steps): # каждый промежуток времени
+        for el in range(len(L)): # Каждое кольцо
+            L[j][el,0] = (L[j-1][el, 0] + ((alpha * dt)/(dr * (dr**2))) * (L[j-1][el, 1] - 2*(L[j-1][el, 0]) + L[j-1][el, 1])) + float(from_heat_to_temperature(Q, capacity, po, dr, dl))*(-1)
             for i in range(1, number_radius_steps - 1): # каждый радиус
-                L[t, el, i] = (L[t-1, el, i] + ((alpha * dt)/((i*dr) * (dr**2))) * (L[t-1, el, i+1] - 2*(L[t-1, el, i]) + L[t-1, el, i-1])) * \
+                L[j][el, i] = (L[j-1][el, i] + ((alpha * dt)/((i*dr) * (dr**2))) * (L[j-1][el, i+1] - 2*(L[j-1][el, i]) + L[j-1][el, i-1])) * \
                     0.97 + float(from_heat_to_temperature(Q, capacity, po, dr, dl))*(1-0.01*i)
-            # Вычисление температуры на дне канала
-            L[t, el, number_radius_steps-1] = (L[t-1, el, number_radius_steps-1] + ((alpha * dt)/(((number_radius_steps-1)*dr) * (dr**2))) * \
-            (L[t-1, el, (number_radius_steps - 2)] - 2*(L[t-1, el, (number_radius_steps - 1)]) + L[t-1, el, (number_radius_steps - 1)])) * 0.97 + float(from_heat_to_temperature(Q, capacity, po, dr, dl)) * 2
+            L[j][el, number_radius_steps-1] = (L[j-1][el, number_radius_steps-1] + ((alpha * dt)/(((number_radius_steps-1)*dr) * (dr**2))) * \
+            (L[j-1][el, (number_radius_steps - 2)] - 2*(L[j-1][el, (number_radius_steps - 1)]) + L[j-1][el, (number_radius_steps - 2)])) * 0.97 + float(from_heat_to_temperature(Q, capacity, po, dr, dl)) * 2
             
     
     return L
+
+
+
